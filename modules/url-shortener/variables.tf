@@ -26,6 +26,15 @@ variable "api_gateway_name" {
 variable "kms_alias" {
   description = "Alias for the customer-managed KMS key used to encrypt the DynamoDB table at rest."
   type        = string
+
+  # Validate that the KMS alias follows AWS's required alias/ prefix convention.
+  validation {
+    # Accept the value only when it begins with the required KMS alias prefix.
+    condition = startswith(var.kms_alias, "alias/")
+
+    # Explain the required format when validation fails.
+    error_message = "kms_alias must start with \"alias/\"."
+  }
 }
 
 # Tags applied consistently to supported AWS resources created by this module.
