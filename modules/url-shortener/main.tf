@@ -64,6 +64,13 @@ resource "aws_lambda_function" "create_link" {
 
   # Limit each Lambda invocation to five seconds.
   timeout = 5
+
+  # Provide the DynamoDB table name to the Lambda at runtime.
+  environment {
+    variables = {
+      DYNAMODB_TABLE_NAME = aws_dynamodb_table.link_records.name
+    }
+  }
 }
 
 
@@ -133,6 +140,14 @@ resource "aws_lambda_function" "get_link_record" {
 
   # Limit each Lambda invocation to five seconds.
   timeout = 5
+
+  # Provide the DynamoDB table name to the Lambda at runtime.
+  environment {
+    variables = {
+      DYNAMODB_TABLE_NAME = aws_dynamodb_table.link_records.name
+    }
+  }
+
 }
 
 # Creates the DynamoDB table used to store shortened-link records.
