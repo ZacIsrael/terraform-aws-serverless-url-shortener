@@ -1,0 +1,62 @@
+openapi: 3.0.0
+info:
+  version: "1"
+  title: Serverless URL Shortener
+  description: >-
+    A secure and observable serverless URL-shortener API on AWS, provisioned
+    with Terraform and protected by customer-managed KMS encryption.
+
+# Reusable components: parameters, schemas, securitySchemes, responses, etc.
+components:
+  securitySchemes:
+    # AWS IAM authorization scheme used by protected API Gateway routes.
+    AWSAuthorization:
+      type: apiKey
+      in: header
+      name: Authorization
+      # API Gateway extension identifying this scheme as AWS SigV4 authentication.
+      x-amazon-apigateway-authtype: awsSigv4
+      description: >
+        AWS Signature Version 4 (SigV4) authentication. 
+
+paths:
+  /links:
+    # Creates a new shortened-link record. This route is protected by AWS IAM.
+    post:
+      summary: Creates a shortened URL
+      description: Creates a shortened URL by generating an eight-character URL-safe code and storing the link record in DynamoDB.
+      # Require callers to authenticate with the reusable AWS SigV4 security scheme.
+      security:
+        - AWSAuthorization: []
+      # The request must contain a JSON body with a valid HTTPS target URL.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - url
+              properties:
+                # Destination URL to associate with the generated short code.
+                url:
+                  type: string
+                  format: uri
+                  pattern: "^https://"
+                  maxLength: 2048
+                  example: https://example.com
+
+                # Optional link lifetime in days; defaults to seven days.
+                expires_in_days:
+                  type: integer
+                  minimum: 1
+                  maximum: 30
+                  default: 7
+      # Document the expected creation, validation, and authorization outcomes.
+      responses:
+        "201":
+          description: Shortened URL created successfully
+        "400":
+          description: Request body is invalid
+        "403":
+          description: Request is not authorized
