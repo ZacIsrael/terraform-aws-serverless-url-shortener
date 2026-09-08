@@ -17,7 +17,22 @@ components:
       # API Gateway extension identifying this scheme as AWS SigV4 authentication.
       x-amazon-apigateway-authtype: awsSigv4
       description: >
-        AWS Signature Version 4 (SigV4) authentication. 
+        AWS Signature Version 4 (SigV4) authentication.
+  parameters:
+    CodePathParam:
+      name: code
+      in: path
+      description: Eight-character short code used to resolve the destination URL.
+      required: true
+      schema:
+        type: string
+  headers:
+    # Reusable response header containing the destination URL for successful redirects.
+    Location:
+      description: Destination URL to which the client is redirected
+      schema:
+        type: string
+        format: uri
 
 paths:
   /links:
@@ -60,3 +75,23 @@ paths:
           description: Request body is invalid
         "403":
           description: Request is not authorized
+  /{code}:
+    # Resolves a short code and redirects the client to its destination URL. This route is public.
+    get:
+      summary: Redirects a short code to its destination URL
+      description: Resolves a short code and redirects the client to the associated destination URL.
+      # Identify the shortened link using the required code supplied in the request path.
+      parameters:
+        - $ref: "#/components/parameters/CodePathParam"
+      # Document successful redirects, unknown codes, and expired links.
+      responses:
+        "302":
+          description: Short code resolved successfully; redirects to the destination URL
+          # Return the resolved destination URL in the standard HTTP Location response header.
+          headers:
+            Location:
+              $ref: "#/components/headers/Location"
+        "404":
+          description: Short code was not found
+        "410":
+          description: Short code has expired
