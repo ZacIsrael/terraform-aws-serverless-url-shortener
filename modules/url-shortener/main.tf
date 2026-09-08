@@ -144,11 +144,11 @@ resource "aws_dynamodb_table" "link_records" {
   billing_mode = "PAY_PER_REQUEST"
 
   # Use the generated short code as the table's partition key.
-  hash_key = "code"
+  hash_key = "short_code"
 
   # Define the string attribute used as the partition key.
   attribute {
-    name = "code"
+    name = "short_code"
     type = "S"
   }
 

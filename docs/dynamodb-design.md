@@ -4,8 +4,8 @@
 
 Each shortened link is stored as a single DynamoDB item with the following attributes:
 
-- `code` — Short code used to identify the link.
-- `destination_url` — Original HTTPS URL to which the client is redirected.
+- `short_code` — Short code used to identify the link.
+- `target_url` — Original HTTPS URL to which the client is redirected.
 - `expires_at` — Expiration timestamp used by application logic and DynamoDB TTL.
 - `created_at` — Timestamp indicating when the shortened link was created.
 
@@ -37,7 +37,7 @@ The application must still check `expires_at` because DynamoDB TTL deletion is a
 
 `GET /{code}`
 
-- Retrieve the item directly using `code`.
+- Retrieve the item directly using `short_code`.
 - Return `302 Found` if the link exists and has not expired.
 - Return `404 Not Found` if the code does not exist.
 - Return `410 Gone` if the link has expired.
