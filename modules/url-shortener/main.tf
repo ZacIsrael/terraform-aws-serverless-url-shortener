@@ -246,6 +246,33 @@ resource "aws_apigatewayv2_stage" "default" {
 
   # Automatically deploy API changes to the default stage.
   auto_deploy = true
+
+  # Sends structured API Gateway access logs to the designated CloudWatch log group.
+  access_log_settings {
+    # Specify the CloudWatch log group that receives the API access logs.
+    destination_arn = aws_cloudwatch_log_group.api_gateway_access_logs.arn
+
+    # Format each access log entry as structured JSON without sensitive request data.
+    format = jsonencode({
+      # Record the unique identifier assigned to the API request.
+      request_id = "$context.requestId"
+
+      # Record when API Gateway received the request.
+      request_time = "$context.requestTime"
+
+      # Record the HTTP method used for the request.
+      http_method = "$context.httpMethod"
+
+      # Record the API route that handled the request.
+      route_key = "$context.routeKey"
+
+      # Record the HTTP status code returned to the client.
+      status = "$context.status"
+
+      # Record the size of the response returned to the client.
+      response_length = "$context.responseLength"
+    })
+  }
 }
 
 # Allows API Gateway to invoke the create-link Lambda function.
@@ -282,4 +309,17 @@ resource "aws_lambda_permission" "allow_api_gateway_get_record_link" {
 
   # Restrict invocation permission to this API Gateway HTTP API.
   source_arn = "${aws_apigatewayv2_api.url_shortener_api.execution_arn}/*/*"
+}
+
+
+# Stores API Gateway access logs so requests and responses can be monitored.
+resource "aws_cloudwatch_log_group" "api_gateway_access_logs" {
+  # Use a descriptive name for the API Gateway access log group.
+  name = "/aws/apigateway/url-shortener-api-access-logs"
+
+  # Retain API access logs for seven days before CloudWatch deletes them.
+  retention_in_days = 7
+
+  # Apply the caller-provided tags to the CloudWatch log group.
+  tags = var.tags
 }
