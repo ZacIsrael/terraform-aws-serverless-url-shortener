@@ -163,4 +163,72 @@ resource "aws_dynamodb_table" "link_records" {
 }
 
 
+# Creates the API Gateway HTTP API that exposes the URL-shortener endpoints.
+resource "aws_apigatewayv2_api" "url_shortener_api" {
+  # Use the caller-provided name for the HTTP API.
+  name = var.api_gateway_name
 
+  # Configure API Gateway to use the HTTP API protocol.
+  protocol_type = "HTTP"
+
+  # Apply the caller-provided tags to the API.
+  tags = var.tags
+}
+
+# Connects the POST /links route to the create-link Lambda function.
+resource "aws_apigatewayv2_integration" "create_link" {
+  # Associate this integration with the URL-shortener HTTP API.
+  api_id = aws_apigatewayv2_api.url_shortener_api.id
+
+  # Use Lambda proxy integration so requests are forwarded directly to Lambda.
+  integration_type = "AWS_PROXY"
+
+  # Invoke the create-link Lambda function for this integration.
+  integration_uri = aws_lambda_function.create_link.invoke_arn
+
+  # Use the HTTP API version 2.0 Lambda event format.
+  payload_format_version = "2.0"
+}
+
+# Routes authenticated POST /links requests to the create-link Lambda integration.
+resource "aws_apigatewayv2_route" "create_link" {
+  # Associate this route with the URL-shortener HTTP API.
+  api_id = aws_apigatewayv2_api.url_shortener_api.id
+
+  # Match POST requests sent to /links.
+  route_key = "POST /links"
+
+  # Require AWS IAM authorization for link creation.
+  authorization_type = "AWS_IAM"
+
+  # Send matching requests to the create-link Lambda integration.
+  target = "integrations/${aws_apigatewayv2_integration.create_link.id}"
+}
+
+
+# Connects the GET /{code} route to the get_link_record Lambda function.
+resource "aws_apigatewayv2_integration" "get_link_record" {
+  # Associate this integration with the URL-shortener HTTP API.
+  api_id = aws_apigatewayv2_api.url_shortener_api.id
+
+  # Use Lambda proxy integration so requests are forwarded directly to Lambda.
+  integration_type = "AWS_PROXY"
+
+  # Invoke the get_link_record Lambda function for this integration.
+  integration_uri = aws_lambda_function.get_link_record.invoke_arn
+
+  # Use the HTTP API version 2.0 Lambda event format.
+  payload_format_version = "2.0"
+}
+
+# Routes public GET /{code} requests to the get_link_record Lambda integration.
+resource "aws_apigatewayv2_route" "get_link_record" {
+  # Associate this route with the URL-shortener HTTP API.
+  api_id = aws_apigatewayv2_api.url_shortener_api.id
+
+  # Match GET requests sent to /{code}.
+  route_key = "GET /{code}"
+
+  # Send matching requests to the get_link_record Lambda integration.
+  target = "integrations/${aws_apigatewayv2_integration.get_link_record.id}"
+}
