@@ -160,6 +160,15 @@ resource "aws_dynamodb_table" "link_records" {
 
   # Apply the caller-provided tags to the DynamoDB table.
   tags = var.tags
+
+  # Encrypt all DynamoDB table data at rest using a customer-managed KMS key.
+  server_side_encryption {
+    # Enable server-side encryption for the DynamoDB table.
+    enabled = true
+
+    # Use this project's customer-managed KMS key instead of an AWS-owned key.
+    kms_key_arn = aws_kms_key.dynamodb.arn
+  }
 }
 
 
@@ -322,4 +331,28 @@ resource "aws_cloudwatch_log_group" "api_gateway_access_logs" {
 
   # Apply the caller-provided tags to the CloudWatch log group.
   tags = var.tags
+}
+
+# Creates the customer-managed KMS key used to encrypt the DynamoDB table.
+resource "aws_kms_key" "dynamodb" {
+  # Describe the purpose of the key for easier identification in AWS.
+  description = "Customer-managed KMS key for URL shortener DynamoDB encryption."
+
+  # Enable automatic annual rotation of the KMS key material.
+  enable_key_rotation = true
+
+  # Require a waiting period before AWS permanently deletes the KMS key.
+  deletion_window_in_days = 7
+
+  # Apply the caller-provided tags to the KMS key.
+  tags = var.tags
+}
+
+# Creates a friendly alias for the customer-managed KMS key.
+resource "aws_kms_alias" "dynamodb" {
+  # Use the caller-provided alias name for the KMS key.
+  name = var.kms_alias
+
+  # Associate the alias with the URL shortener DynamoDB encryption key.
+  target_key_id = aws_kms_key.dynamodb.key_id
 }

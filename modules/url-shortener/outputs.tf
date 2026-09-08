@@ -37,3 +37,15 @@ output "api_execution_arn" {
   description = "Execution ARN of the API Gateway HTTP API for constructing execute-api IAM resource permissions."
   value       = aws_apigatewayv2_api.url_shortener_api.execution_arn
 }
+
+# Exposes the KMS key ARN for IAM policies and resources that use the key for encryption.
+output "kms_key_arn" {
+  description = "ARN of the customer-managed KMS key used to encrypt the URL shortener DynamoDB table."
+  value       = aws_kms_key.dynamodb.arn
+}
+
+# Exposes the KMS alias name for referencing the encryption key by its human-readable alias.
+output "kms_alias_name" {
+  description = "Alias name assigned to the customer-managed KMS key used for DynamoDB encryption."
+  value       = aws_kms_alias.dynamodb.name
+}
