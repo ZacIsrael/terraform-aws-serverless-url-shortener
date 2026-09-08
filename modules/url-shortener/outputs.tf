@@ -1,3 +1,6 @@
+# ARNs identify resources for IAM policies and cross-resource references,
+# while IDs identify resources for service-specific configuration and lookups.
+
 # Exposes the create-link Lambda ARN for use by callers and dependent resources.
 output "create_lambda_arn" {
   description = "ARN of the Lambda function that creates a new shortened-link record in DynamoDB."
