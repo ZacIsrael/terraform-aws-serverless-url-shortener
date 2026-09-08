@@ -134,3 +134,33 @@ resource "aws_lambda_function" "get_link_record" {
   # Limit each Lambda invocation to five seconds.
   timeout = 5
 }
+
+# Creates the DynamoDB table used to store shortened-link records.
+resource "aws_dynamodb_table" "link_records" {
+  # Use the caller-provided name for the DynamoDB table.
+  name = var.dynamodb_table_name
+
+  # Use on-demand capacity so DynamoDB automatically handles request throughput.
+  billing_mode = "PAY_PER_REQUEST"
+
+  # Use the generated short code as the table's partition key.
+  hash_key = "code"
+
+  # Define the string attribute used as the partition key.
+  attribute {
+    name = "code"
+    type = "S"
+  }
+
+  # Enable automatic cleanup of expired items using the expiration timestamp.
+  ttl {
+    attribute_name = "expires_at"
+    enabled        = true
+  }
+
+  # Apply the caller-provided tags to the DynamoDB table.
+  tags = var.tags
+}
+
+
+
