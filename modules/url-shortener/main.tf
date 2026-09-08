@@ -232,3 +232,54 @@ resource "aws_apigatewayv2_route" "get_link_record" {
   # Send matching requests to the get_link_record Lambda integration.
   target = "integrations/${aws_apigatewayv2_integration.get_link_record.id}"
 }
+
+
+# Creates the default API Gateway stage used to serve the URL-shortener API.
+# Deploys the API so its routes can actually receive requests.
+# Using $default makes the API accessible without a stage name in the URL.
+resource "aws_apigatewayv2_stage" "default" {
+  # Associate this stage with the URL-shortener HTTP API.
+  api_id = aws_apigatewayv2_api.url_shortener_api.id
+
+  # Use the special $default stage so requests do not require a stage prefix.
+  name = "$default"
+
+  # Automatically deploy API changes to the default stage.
+  auto_deploy = true
+}
+
+# Allows API Gateway to invoke the create-link Lambda function.
+resource "aws_lambda_permission" "allow_api_gateway_create_link" {
+  # Assign a unique identifier to this Lambda resource-based policy statement.
+  statement_id = "AllowAPIGatewayInvokeCreateLink"
+
+  # Permit API Gateway to invoke the Lambda function.
+  action = "lambda:InvokeFunction"
+
+  # Grant the permission on the create-link Lambda function.
+  function_name = aws_lambda_function.create_link.function_name
+
+  # Grant invocation permission specifically to the API Gateway service.
+  principal = "apigateway.amazonaws.com"
+
+  # Restrict invocation permission to this API Gateway HTTP API.
+  source_arn = "${aws_apigatewayv2_api.url_shortener_api.execution_arn}/*/*"
+}
+
+# Allows API Gateway to invoke the resolve-link Lambda function.
+resource "aws_lambda_permission" "allow_api_gateway_get_record_link" {
+  # Assign a unique identifier to this Lambda resource-based policy statement.
+  statement_id = "AllowAPIGatewayInvokeGetRecordLink"
+
+  # Permit API Gateway to invoke the Lambda function.
+  action = "lambda:InvokeFunction"
+
+  # Grant the permission on the resolve-link Lambda function.
+  function_name = aws_lambda_function.get_link_record.function_name
+
+  # Grant invocation permission specifically to the API Gateway service.
+  principal = "apigateway.amazonaws.com"
+
+  # Restrict invocation permission to this API Gateway HTTP API.
+  source_arn = "${aws_apigatewayv2_api.url_shortener_api.execution_arn}/*/*"
+}
