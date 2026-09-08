@@ -1,0 +1,84 @@
+# ==========================================
+# Terraform
+# ==========================================
+
+# Local Terraform directories
+.terraform/
+
+# Terraform state files
+*.tfstate
+*.tfstate.*
+
+# Saved Terraform plan files
+*.tfplan
+
+# Sensitive Terraform variable files
+*.tfvars
+*.tfvars.json
+
+# Terraform override files
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Terraform crash logs
+crash.log
+crash.*.log
+
+# Terraform CLI configuration
+.terraformrc
+terraform.rc
+
+
+# ==========================================
+# Node.js / TypeScript
+# ==========================================
+
+# Installed dependencies
+node_modules/
+
+# Compiled TypeScript and build output
+dist/
+build/
+
+# Test coverage output
+coverage/
+
+
+# ==========================================
+# Generated Artifacts
+# ==========================================
+
+# Generated deployment archives
+*.zip
+
+
+# ==========================================
+# Environment / Credentials
+# ==========================================
+
+# Environment variable files
+.env
+.env.*
+
+# Private keys and certificates
+*.pem
+*.key
+
+
+# ==========================================
+# Verification Evidence
+# ==========================================
+
+# Local verification screenshots that may contain AWS resource identifiers
+docs/verification/*.png
+
+
+# ==========================================
+# OS / IDE
+# ==========================================
+
+.DS_Store
+.vscode/
+.idea/
