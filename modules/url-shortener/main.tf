@@ -313,8 +313,8 @@ resource "aws_lambda_permission" "allow_api_gateway_create_link" {
   # Grant invocation permission specifically to the API Gateway service.
   principal = "apigateway.amazonaws.com"
 
-  # Restrict invocation permission to this API Gateway HTTP API.
-  source_arn = "${aws_apigatewayv2_api.url_shortener_api.execution_arn}/*/*"
+  # Restrict API Gateway invocation to the POST /links route only.
+  source_arn = "${aws_apigatewayv2_api.url_shortener_api.execution_arn}/*/POST/links"
 }
 
 # Allows API Gateway to invoke the resolve-link Lambda function.
@@ -331,8 +331,8 @@ resource "aws_lambda_permission" "allow_api_gateway_get_record_link" {
   # Grant invocation permission specifically to the API Gateway service.
   principal = "apigateway.amazonaws.com"
 
-  # Restrict invocation permission to this API Gateway HTTP API.
-  source_arn = "${aws_apigatewayv2_api.url_shortener_api.execution_arn}/*/*"
+  # Restrict API Gateway invocation to GET requests handled by the /{code} route.
+  source_arn = "${aws_apigatewayv2_api.url_shortener_api.execution_arn}/*/GET/*"
 }
 
 
