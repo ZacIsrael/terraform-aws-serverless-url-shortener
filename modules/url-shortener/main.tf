@@ -454,3 +454,70 @@ resource "aws_kms_alias" "dynamodb" {
   # Associate the alias with the URL shortener DynamoDB encryption key.
   target_key_id = aws_kms_key.dynamodb.key_id
 }
+
+# Defines the least-privilege DynamoDB permissions required by the create-link Lambda.
+data "aws_iam_policy_document" "create_link_dynamodb" {
+  statement {
+    # Allow the create-link Lambda to perform the permitted DynamoDB action.
+    effect = "Allow"
+
+    # Permit only item creation; the create-link Lambda does not need read or delete access.
+    actions = [
+      "dynamodb:PutItem",
+    ]
+
+    # Restrict write access to this project's URL-shortener table.
+    resources = [
+      aws_dynamodb_table.link_records.arn,
+    ]
+  }
+}
+
+# Creates the IAM policy containing the create-link Lambda's DynamoDB permissions.
+resource "aws_iam_policy" "create_link_dynamodb" {
+  # Convert the generated IAM policy document into the JSON required by AWS IAM.
+  policy = data.aws_iam_policy_document.create_link_dynamodb.json
+}
+
+# Attaches the DynamoDB write policy to the create-link Lambda execution role.
+resource "aws_iam_role_policy_attachment" "create_link_dynamodb" {
+  # Attach the policy only to the execution role used by the create-link Lambda.
+  role = aws_iam_role.create_link_lambda_role.name
+
+  # Grant the role the least-privilege DynamoDB write policy defined above.
+  policy_arn = aws_iam_policy.create_link_dynamodb.arn
+}
+
+
+# Defines the least-privilege DynamoDB permissions required by the resolve-link Lambda.
+data "aws_iam_policy_document" "resolve_link_dynamodb" {
+  statement {
+    # Allow the resolve-link Lambda to perform the permitted DynamoDB action.
+    effect = "Allow"
+
+    # Permit only direct item reads; the resolver does not need write or delete access.
+    actions = [
+      "dynamodb:GetItem",
+    ]
+
+    # Restrict read access to this project's URL-shortener table.
+    resources = [
+      aws_dynamodb_table.link_records.arn,
+    ]
+  }
+}
+
+# Creates the IAM policy containing the resolve-link Lambda's DynamoDB permissions.
+resource "aws_iam_policy" "resolve_link_dynamodb" {
+  # Convert the generated IAM policy document into the JSON required by AWS IAM.
+  policy = data.aws_iam_policy_document.resolve_link_dynamodb.json
+}
+
+# Attaches the DynamoDB read policy to the resolve-link Lambda execution role.
+resource "aws_iam_role_policy_attachment" "resolve_link_dynamodb" {
+  # Attach the policy only to the execution role used by the resolve-link Lambda.
+  role = aws_iam_role.get_link_record_lambda_role.name
+
+  # Grant the role the least-privilege DynamoDB read policy defined above.
+  policy_arn = aws_iam_policy.resolve_link_dynamodb.arn
+}
