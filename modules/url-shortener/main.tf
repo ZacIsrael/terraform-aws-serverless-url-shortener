@@ -232,37 +232,6 @@ resource "aws_cloudwatch_log_group" "api_gateway_access_logs" {
   tags = var.tags
 }
 
-# Retrieves the AWS account ID of the identity running Terraform.
-data "aws_caller_identity" "current" {}
-
-# Creates the customer-managed KMS key used to encrypt the DynamoDB table.
-resource "aws_kms_key" "dynamodb" {
-  # Describe the purpose of the key for easier identification in AWS.
-  description = "Customer-managed KMS key for URL shortener DynamoDB encryption."
-
-  # Enable automatic annual rotation of the KMS key material.
-  enable_key_rotation = true
-
-  # Require a waiting period before AWS permanently deletes the KMS key.
-  deletion_window_in_days = 7
-
-  # Attach the generated KMS key policy to this key to control who can administer
-  # and use it, including restricting application key usage to DynamoDB.
-  policy = data.aws_iam_policy_document.dynamodb_kms.json
-
-  # Apply the caller-provided tags to the KMS key.
-  tags = var.tags
-}
-
-# Creates a friendly alias for the customer-managed KMS key.
-resource "aws_kms_alias" "dynamodb" {
-  # Use the caller-provided alias name for the KMS key.
-  name = var.kms_alias
-
-  # Associate the alias with the URL shortener DynamoDB encryption key.
-  target_key_id = aws_kms_key.dynamodb.key_id
-}
-
 # Creates the IAM policy containing the create-link Lambda's DynamoDB permissions.
 resource "aws_iam_policy" "create_link_dynamodb" {
   # Convert the generated IAM policy document into the JSON required by AWS IAM.
