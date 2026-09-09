@@ -271,6 +271,15 @@ resource "aws_apigatewayv2_stage" "default" {
   # Automatically deploy API changes to the default stage.
   auto_deploy = true
 
+  # Apply default throttling limits to all routes to control excessive API traffic.
+  default_route_settings {
+    # Limit the sustained request rate across routes in the default stage.
+    throttling_rate_limit = 50
+
+    # Allow short traffic bursts up to this request limit.
+    throttling_burst_limit = 100
+  }
+
   # Sends structured API Gateway access logs to the designated CloudWatch log group.
   access_log_settings {
     # Specify the CloudWatch log group that receives the API access logs.
