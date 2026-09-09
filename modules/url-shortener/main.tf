@@ -521,3 +521,29 @@ resource "aws_iam_role_policy_attachment" "resolve_link_dynamodb" {
   # Grant the role the least-privilege DynamoDB read policy defined above.
   policy_arn = aws_iam_policy.resolve_link_dynamodb.arn
 }
+
+# Explicitly manage the create-link Lambda log group so Terraform controls
+# log retention instead of leaving the default indefinite retention period.
+resource "aws_cloudwatch_log_group" "create_link" {
+  # Match Lambda's standard CloudWatch log group naming convention.
+  name = "/aws/lambda/${var.create_lambda_name}"
+
+  # Retain application logs for seven days to limit unnecessary log storage.
+  retention_in_days = 7
+
+  # Apply the module's common resource tags.
+  tags = var.tags
+}
+
+# Explicitly manage the resolve-link Lambda log group so Terraform controls
+# log retention instead of leaving the default indefinite retention period.
+resource "aws_cloudwatch_log_group" "resolve_link" {
+  # Match Lambda's standard CloudWatch log group naming convention.
+  name = "/aws/lambda/${var.resolve_lambda_name}"
+
+  # Retain application logs for seven days to limit unnecessary log storage.
+  retention_in_days = 7
+
+  # Apply the module's common resource tags.
+  tags = var.tags
+}
