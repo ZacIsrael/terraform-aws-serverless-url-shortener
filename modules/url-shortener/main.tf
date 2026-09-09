@@ -556,3 +556,80 @@ resource "aws_cloudwatch_log_group" "resolve_link" {
   # Apply the module's common resource tags.
   tags = var.tags
 }
+
+
+# Monitors the create-link Lambda function for execution failures.
+resource "aws_cloudwatch_metric_alarm" "create_link_lambda_error_alarm" {
+  # Give the alarm a unique name based on the Lambda function being monitored.
+  alarm_name = "lambda-error-count-${aws_lambda_function.create_link.function_name}"
+
+  # Enter the ALARM state when the error count reaches or exceeds the threshold.
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+
+  # Require one evaluation period to breach the threshold before triggering the alarm.
+  evaluation_periods = 1
+
+  # Trigger the alarm when at least one Lambda execution error occurs.
+  threshold = 1
+
+  # Evaluate the Lambda error metric over 60-second intervals.
+  period = 60
+
+  # Monitor the built-in Lambda metric that records failed function invocations.
+  metric_name = "Errors"
+
+  # Use the AWS Lambda CloudWatch metric namespace.
+  namespace = "AWS/Lambda"
+
+  # Sum all execution errors that occur during each evaluation period.
+  statistic = "Sum"
+
+  # Describe the condition that causes this CloudWatch alarm to trigger.
+  alarm_description = "Triggers when the create-link Lambda function reports one or more errors within a 60-second period."
+
+  # Treat periods without metric data as healthy instead of triggering the alarm.
+  treat_missing_data = "notBreaching"
+
+  # Restrict the Errors metric to the create-link Lambda function.
+  dimensions = {
+    FunctionName = aws_lambda_function.create_link.function_name
+  }
+}
+
+# Monitors the get-link-record Lambda function for execution failures.
+resource "aws_cloudwatch_metric_alarm" "get_link_record_lambda_error_alarm" {
+  # Give the alarm a unique name based on the Lambda function being monitored.
+  alarm_name = "lambda-error-count-${aws_lambda_function.get_link_record.function_name}"
+
+  # Enter the ALARM state when the error count reaches or exceeds the threshold.
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+
+  # Require one evaluation period to breach the threshold before triggering the alarm.
+  evaluation_periods = 1
+
+  # Trigger the alarm when at least one Lambda execution error occurs.
+  threshold = 1
+
+  # Evaluate the Lambda error metric over 60-second intervals.
+  period = 60
+
+  # Monitor the built-in Lambda metric that records failed function invocations.
+  metric_name = "Errors"
+
+  # Use the AWS Lambda CloudWatch metric namespace.
+  namespace = "AWS/Lambda"
+
+  # Sum all execution errors that occur during each evaluation period.
+  statistic = "Sum"
+
+  # Describe the condition that causes this CloudWatch alarm to trigger.
+  alarm_description = "Triggers when the get-link-record Lambda function reports one or more errors within a 60-second period."
+
+  # Treat periods without metric data as healthy instead of triggering the alarm.
+  treat_missing_data = "notBreaching"
+
+  # Restrict the Errors metric to the get-link-record Lambda function.
+  dimensions = {
+    FunctionName = aws_lambda_function.get_link_record.function_name
+  }
+}
