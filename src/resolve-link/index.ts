@@ -19,6 +19,13 @@ export const handler = async (
   if (requestedCode === undefined) {
     return {
       statusCode: 400,
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        error: "Invalid request",
+        message: "code path parameter is required.",
+      }),
     };
   }
 
@@ -26,6 +33,13 @@ export const handler = async (
   if (!/^[a-f0-9]{8}$/i.test(requestedCode)) {
     return {
       statusCode: 400,
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        error: "Invalid code",
+        message: "code must be exactly 8 hexadecimal characters.",
+      }),
     };
   }
 
@@ -70,6 +84,13 @@ export const handler = async (
   if (linkRecord === undefined) {
     return {
       statusCode: 404,
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        error: "Not found",
+        message: "No shortened link exists for the provided code.",
+      }),
     };
   }
 
@@ -77,9 +98,15 @@ export const handler = async (
   if (linkRecord.expires_at <= Math.floor(Date.now() / 1000)) {
     return {
       statusCode: 410,
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        error: "Link expired",
+        message: "The shortened link has expired.",
+      }),
     };
   }
-
   // Redirect the caller to the original destination URL.
   return {
     statusCode: 302,
