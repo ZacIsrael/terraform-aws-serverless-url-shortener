@@ -3,8 +3,19 @@ data "archive_file" "create_link_code" {
   # Create a ZIP-formatted Lambda deployment package.
   type = "zip"
 
-  # Package the JavaScript generated from src/create-link/index.ts.
-  source_file = "${path.module}/../../dist/create-link/index.js"
+  # Include the compiled Lambda handler.
+  source {
+    content  = file("${path.module}/../../dist/create-link/index.js")
+    filename = "index.js"
+  }
+
+  # Mark JavaScript files in the deployment package as ES modules.
+  source {
+    content = jsonencode({
+      type = "module"
+    })
+    filename = "package.json"
+  }
 
   # Store the generated deployment archive with the compiled function.
   output_path = "${path.module}/../../dist/create-link/function.zip"
@@ -46,8 +57,19 @@ data "archive_file" "get_link_record_code" {
   # Create a ZIP-formatted Lambda deployment package.
   type = "zip"
 
-  # Package the JavaScript generated from src/resolve-link/index.ts.
-  source_file = "${path.module}/../../dist/resolve-link/index.js"
+  # Include the compiled Lambda handler.
+  source {
+    content  = file("${path.module}/../../dist/resolve-link/index.js")
+    filename = "index.js"
+  }
+
+  # Mark JavaScript files in the deployment package as ES modules.
+  source {
+    content = jsonencode({
+      type = "module"
+    })
+    filename = "package.json"
+  }
 
   # Store the generated deployment archive with the compiled function.
   output_path = "${path.module}/../../dist/resolve-link/function.zip"
