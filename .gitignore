@@ -91,3 +91,6 @@ examples/basic/*.txt
 
 # Ignore raw verification evidence that may contain sensitive deployment information.
 docs/verification/raw/
+
+# Local verification evidence
+docs/verification/sanitized/
