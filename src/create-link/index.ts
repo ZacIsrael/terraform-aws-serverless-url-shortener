@@ -17,6 +17,13 @@ export const handler = async (
   if (event.body === undefined) {
     return {
       statusCode: 400,
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        error: "Invalid request",
+        message: "Request body is required.",
+      }),
     };
   }
 
@@ -28,6 +35,13 @@ export const handler = async (
   } catch {
     return {
       statusCode: 400,
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        error: "Invalid request",
+        message: "Request body must contain valid JSON.",
+      }),
     };
   }
 
@@ -35,6 +49,13 @@ export const handler = async (
   if (body === null || typeof body !== "object" || Array.isArray(body)) {
     return {
       statusCode: 400,
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        error: "Invalid request",
+        message: "Request body must be a JSON object.",
+      }),
     };
   }
 
@@ -45,6 +66,13 @@ export const handler = async (
   if (url === undefined) {
     return {
       statusCode: 400,
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        error: "Invalid request",
+        message: "url is required.",
+      }),
     };
   }
 
@@ -52,6 +80,13 @@ export const handler = async (
   if (typeof url !== "string") {
     return {
       statusCode: 400,
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        error: "Invalid URL",
+        message: "url must be a string.",
+      }),
     };
   }
 
@@ -59,6 +94,13 @@ export const handler = async (
   if (url.length > 2048) {
     return {
       statusCode: 400,
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        error: "Invalid URL",
+        message: "url must not exceed 2048 characters.",
+      }),
     };
   }
 
@@ -69,11 +111,25 @@ export const handler = async (
     if (parsedUrl.protocol !== "https:") {
       return {
         statusCode: 400,
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          error: "Invalid URL",
+          message: "url must use the HTTPS protocol.",
+        }),
       };
     }
   } catch {
     return {
       statusCode: 400,
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        error: "Invalid URL",
+        message: "url must be a valid HTTPS URL.",
+      }),
     };
   }
 
@@ -86,6 +142,13 @@ export const handler = async (
     ) {
       return {
         statusCode: 400,
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          error: "Invalid expiration",
+          message: "expires_in_days must be an integer.",
+        }),
       };
     }
 
@@ -93,6 +156,13 @@ export const handler = async (
     if (expires_in_days < 1 || expires_in_days > 30) {
       return {
         statusCode: 400,
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          error: "Invalid expiration",
+          message: "expires_in_days must be between 1 and 30.",
+        }),
       };
     }
   }
