@@ -218,18 +218,18 @@ No changes. Your infrastructure matches the configuration.
 
 ### API Validation
 
-Test Expected Verified
-
+| Test | Expected | Verified |
 | --- | --- | --- |
-
-Unsigned `POST /links` `403` Yes Signed valid `POST /links` `201` Yes
-Valid `GET /{code}` `302` Yes Invalid input `400` Yes Validly formatted
-unknown code `404` Yes Expired code `410` Yes
+| Unsigned `POST /links` | `403` | Yes |
+| Signed valid `POST /links` | `201` | Yes |
+| Valid `GET /{code}` | `302` | Yes |
+| Invalid input | `400` | Yes |
+| Validly formatted unknown code | `404` | Yes |
+| Expired code | `410` | Yes |
 
 ### KMS / DynamoDB Validation
 
-AWS CLI checks verified the DynamoDB encryption configuration, KMS alias
-target, and automatic key rotation.
+AWS CLI checks verified the DynamoDB encryption configuration, KMS alias target, and automatic key rotation.
 
 ### Controlled IAM Failure and Recovery
 
