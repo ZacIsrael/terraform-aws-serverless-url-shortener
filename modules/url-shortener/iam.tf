@@ -22,6 +22,9 @@ data "aws_iam_policy_document" "resolve_link_dynamodb" {
     # Allow the resolve-link Lambda to perform the permitted DynamoDB action.
     effect = "Allow"
 
+    # Test IAM permission enforcement by explicitly denying DynamoDB GetItem access.
+    # effect = "Deny"
+
     # Permit only direct item reads; the resolver does not need write or delete access.
     actions = [
       "dynamodb:GetItem",
