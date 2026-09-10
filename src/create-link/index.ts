@@ -144,7 +144,7 @@ export const handler = async (
     const putLinkCommand = new PutCommand({
       TableName: dynamodbTableName,
       Item: {
-        short_code,
+        short_code: generatedShortCode,
         target_url: url,
         created_at,
         expires_at,
