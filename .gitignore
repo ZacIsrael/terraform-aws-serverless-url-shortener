@@ -88,3 +88,6 @@ docs/verification/*.png
 # ==========================================
 
 examples/basic/*.txt
+
+# Ignore raw verification evidence that may contain sensitive deployment information.
+docs/verification/raw/
